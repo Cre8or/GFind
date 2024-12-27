@@ -1,0 +1,257 @@
+[gd_scene load_steps=8 format=3 uid="uid://c3wsoae6f8jbb"]
+
+[ext_resource type="Script" path="res://scripts/gFind.gd" id="1_y5487"]
+[ext_resource type="Texture2D" uid="uid://crwltrnyrxth2" path="res://icons/FolderBrowse.svg" id="2_mdfp2"]
+[ext_resource type="Script" path="res://scripts/controls/container_searchDirectory.gd" id="2_qa51y"]
+[ext_resource type="Texture2D" uid="uid://b7vi5pevn204j" path="res://icons/Search.svg" id="3_82qgp"]
+[ext_resource type="Texture2D" uid="uid://b5wutonpiqeam" path="res://icons/Rename.svg" id="4_jqttm"]
+[ext_resource type="Texture2D" uid="uid://dovjegrrlvo5c" path="res://icons/MissingNode.svg" id="6_41gc7"]
+[ext_resource type="Texture2D" uid="uid://5sgc37tev4lc" path="res://icons/ImportCheck.svg" id="7_ofaco"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="Background" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." node_paths=PackedStringArray("CtrlSearchDir", "CtrlSearchTerm", "CtrlReplaceTerm", "CtrlButtonSearch", "CtrlButtonReplace", "CtrlRecursive", "CtrlRegex", "CtrlExtendedPreviews", "CtrlCaseSensitive", "CtrlIncludeBinary", "CtrlStatus", "CtrlTable", "CtrlWindowConfirm", "CtrlButtonReplaceCancel", "CtrlButtonReplaceConfirm", "CtrlWindowTooltip", "CtrlTooltip")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_right = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_y5487")
+CtrlSearchDir = NodePath("PanelContainer_Directory/MarginContainer/HBoxContainer/LineEdit_Directory")
+CtrlSearchTerm = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/TextEdit_Search")
+CtrlReplaceTerm = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/TextEdit_Replace")
+CtrlButtonSearch = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/Button_Search")
+CtrlButtonReplace = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/Button_Replace")
+CtrlRecursive = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/Recursive_CheckBox")
+CtrlRegex = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/Regex_CheckBox")
+CtrlExtendedPreviews = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/ExtendedPreviews_CheckBox")
+CtrlCaseSensitive = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/CaseSensitive_CheckBox")
+CtrlIncludeBinary = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/IncludeBinary_CheckBox")
+CtrlStatus = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/Status")
+CtrlTable = NodePath("PanelContainer/MarginContainer/Results")
+CtrlWindowConfirm = NodePath("../Window_ConfirmReplace")
+CtrlButtonReplaceCancel = NodePath("../Window_ConfirmReplace/PanelContainer/VBoxContainer/HBoxContainer/Button_Cancel")
+CtrlButtonReplaceConfirm = NodePath("../Window_ConfirmReplace/PanelContainer/VBoxContainer/HBoxContainer/Button_Confirm")
+CtrlWindowTooltip = NodePath("../Window_Tooltip")
+CtrlTooltip = NodePath("../Window_Tooltip/Tooltip")
+test_data_source_directory = "/d/Godot/GFind_Source"
+test_search_directory = "/d/Godot/GFind_Workspace"
+test_search_term = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
+test_replace_term = "$1"
+test_search_recursively = true
+test_use_regex = true
+
+[node name="PanelContainer_Directory" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer_Directory"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer_Directory/MarginContainer" node_paths=PackedStringArray("CtrlButton", "CtrlText", "CtrlDialog")]
+layout_mode = 2
+size_flags_vertical = 0
+script = ExtResource("2_qa51y")
+CtrlButton = NodePath("Button")
+CtrlText = NodePath("LineEdit_Directory")
+CtrlDialog = NodePath("FileDialog")
+
+[node name="Button" type="Button" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Browse"
+icon = ExtResource("2_mdfp2")
+
+[node name="LineEdit_Directory" type="LineEdit" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+caret_blink = true
+
+[node name="FileDialog" type="FileDialog" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
+title = "Open a Directory"
+size = Vector2i(860, 180)
+ok_button_text = "Select Current Folder"
+file_mode = 2
+access = 2
+use_native_dialog = true
+
+[node name="PanelContainer_SearchReplace" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer_SearchReplace"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Label_Search" type="Label" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Search for:"
+
+[node name="TextEdit_Search" type="TextEdit" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 1
+scroll_fit_content_height = true
+caret_blink = true
+
+[node name="Button_Search" type="Button" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Find all"
+icon = ExtResource("3_82qgp")
+
+[node name="Label_Replace" type="Label" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Replace with:"
+
+[node name="TextEdit_Replace" type="TextEdit" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 1
+scroll_fit_content_height = true
+caret_blink = true
+
+[node name="Button_Replace" type="Button" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Replace all"
+icon = ExtResource("4_jqttm")
+
+[node name="Control_PaddingL" type="Control" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Recursive_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+layout_mode = 2
+text = "Search recursively"
+
+[node name="Regex_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+layout_mode = 2
+text = "Regular expression"
+
+[node name="ExtendedPreviews_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+layout_mode = 2
+text = "Extended previews"
+
+[node name="CaseSensitive_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+layout_mode = 2
+text = "Search case-sensitive"
+
+[node name="IncludeBinary_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+layout_mode = 2
+text = "Include binary files"
+
+[node name="Control_PaddingR" type="Control" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Status" type="RichTextLabel" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Status"
+fit_content = true
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Results" type="Tree" parent="VBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+columns = 4
+column_titles_visible = true
+hide_root = true
+select_mode = 1
+
+[node name="Window_ConfirmReplace" type="Window" parent="."]
+disable_3d = true
+title = "Replace All"
+initial_position = 2
+size = Vector2i(280, 120)
+visible = false
+transient = true
+unresizable = true
+popup_window = true
+
+[node name="Background" type="Panel" parent="Window_ConfirmReplace"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Window_ConfirmReplace"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window_ConfirmReplace/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Window_ConfirmReplace/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 1
+text = "Are you sure you want to replace all occurences across all files?
+
+This action cannot be undone!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window_ConfirmReplace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Button_Cancel" type="Button" parent="Window_ConfirmReplace/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+icon = ExtResource("6_41gc7")
+
+[node name="Button_Confirm" type="Button" parent="Window_ConfirmReplace/PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Confirm"
+icon = ExtResource("7_ofaco")
+
+[node name="Window_Tooltip" type="Window" parent="."]
+transparent_bg = true
+initial_position = 2
+size = Vector2i(200, 100)
+visible = false
+transient = true
+unresizable = true
+borderless = true
+transparent = true
+mouse_passthrough = true
+
+[node name="Background" type="Panel" parent="Window_Tooltip"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Tooltip" type="RichTextLabel" parent="Window_Tooltip"]
+text = "Tooltip text"
+fit_content = true
+autowrap_mode = 0
