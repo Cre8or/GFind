@@ -31,7 +31,7 @@ class T_Search_Settings:
 	var search_case_sensitive : bool
 	var use_regex             : bool
 	var include_binary        : bool
-	var extended_previews     : bool
+	var include_hidden        : bool
 
 class T_Search_Result:
 	var file_name  : String
@@ -87,6 +87,7 @@ const C_KEY_SEARCH_RECURSIVELY    := "search_recursively"
 const C_KEY_SEARCH_CASE_SENSITIVE := "search_case_sensitive"
 const C_KEY_USE_REGEX             := "use_regex"
 const C_KEY_INCLUDE_BINARY        := "include_binary"
+const C_KEY_INCLUDE_HIDDEN        := "include_hidden"
 
 
 # Exports
@@ -97,10 +98,10 @@ const C_KEY_INCLUDE_BINARY        := "include_binary"
 @export var CtrlButtonSearch         : Button
 @export var CtrlButtonReplace        : Button
 @export var CtrlRecursive            : CheckBox
-@export var CtrlRegex                : CheckBox
-@export var CtrlExtendedPreviews     : CheckBox
 @export var CtrlCaseSensitive        : CheckBox
+@export var CtrlRegex                : CheckBox
 @export var CtrlIncludeBinary        : CheckBox
+@export var CtrlIncludeHidden        : CheckBox
 @export var CtrlStatus               : RichTextLabel
 @export var CtrlTable                : Tree
 
@@ -120,7 +121,7 @@ const C_KEY_INCLUDE_BINARY        := "include_binary"
 @export var test_search_case_sensitive : bool
 @export var test_use_regex             : bool
 @export var test_include_binary        : bool
-@export var test_extended_previews     : bool
+@export var test_include_hidden        : bool
 
 
 
@@ -283,12 +284,15 @@ func _parse_command_line() -> void:
 				OS.execute("rm", ["-r", test_search_directory])
 			OS.execute("cp", ["-r", "-a", "-L", test_data_source_directory, test_search_directory])
 
-		CtrlSearchDir.text           = test_search_directory
-		CtrlSearchTerm.text          = test_search_term
-		#CtrlSearchTerm.text         = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
-		CtrlReplaceTerm.text         = test_replace_term
-		CtrlRecursive.button_pressed = test_search_recursively
-		CtrlRegex.button_pressed     = test_use_regex
+		CtrlSearchDir.text               = test_search_directory
+		CtrlSearchTerm.text              = test_search_term
+		#CtrlSearchTerm.text             = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
+		CtrlReplaceTerm.text             = test_replace_term
+		CtrlRecursive.button_pressed     = test_search_recursively
+		CtrlCaseSensitive.button_pressed = test_search_case_sensitive
+		CtrlRegex.button_pressed         = test_use_regex
+		CtrlIncludeBinary.button_pressed = test_include_binary
+		CtrlIncludeHidden.button_pressed = test_include_hidden
 
 		_on_search_pressed()
 		return
@@ -336,6 +340,7 @@ func _load_user_preferences() -> void:
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_TERM, "") as String
 	CtrlReplaceTerm.text = preferences.get_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_REPLACE_TERM, "") as String
+
 	CtrlRecursive.button_pressed = preferences.get_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_RECURSIVELY, false) as bool
 	CtrlCaseSensitive.button_pressed = preferences.get_value(
@@ -344,6 +349,8 @@ func _load_user_preferences() -> void:
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_USE_REGEX, false) as bool
 	CtrlIncludeBinary.button_pressed = preferences.get_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_BINARY, false) as bool
+	CtrlIncludeHidden.button_pressed = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_HIDDEN, false) as bool
 
 # --------------------------------------------------------------------------------------------------
 func _save_user_preferences() -> void:
@@ -354,6 +361,7 @@ func _save_user_preferences() -> void:
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_TERM, CtrlSearchTerm.text)
 	preferences.set_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_REPLACE_TERM, CtrlReplaceTerm.text)
+
 	preferences.set_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_RECURSIVELY, CtrlRecursive.button_pressed)
 	preferences.set_value(
@@ -362,6 +370,8 @@ func _save_user_preferences() -> void:
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_USE_REGEX, CtrlRegex.button_pressed)
 	preferences.set_value(
 		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_BINARY, CtrlIncludeBinary.button_pressed)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_HIDDEN, CtrlIncludeHidden.button_pressed)
 
 	var file_path := _m_executable_dir + "/" + C_FILENAME_PREFERENCES
 	preferences.save(file_path)
@@ -373,7 +383,7 @@ func _get_current_search_settings() -> T_Search_Settings:
 	settings.search_case_sensitive = CtrlCaseSensitive.button_pressed
 	settings.use_regex             = CtrlRegex.button_pressed
 	settings.include_binary        = CtrlIncludeBinary.button_pressed
-	settings.extended_previews     = CtrlExtendedPreviews.button_pressed
+	settings.include_hidden        = CtrlIncludeHidden.button_pressed
 
 	return settings
 
@@ -437,11 +447,11 @@ func _enable_search_ctrls(state : bool) -> void:
 	CtrlButtonSearch.disabled  = state_inv
 	CtrlButtonReplace.disabled = state_inv
 
-	CtrlRecursive.disabled        = state_inv
-	CtrlRegex.disabled            = state_inv
-	CtrlExtendedPreviews.disabled = state_inv
-	CtrlCaseSensitive.disabled    = state_inv
-	CtrlIncludeBinary.disabled    = state_inv
+	CtrlRecursive.disabled     = state_inv
+	CtrlRegex.disabled         = state_inv
+	CtrlIncludeHidden.disabled = state_inv
+	CtrlCaseSensitive.disabled = state_inv
+	CtrlIncludeBinary.disabled = state_inv
 
 # --------------------------------------------------------------------------------------------------
 func _set_status(status : T_Status) -> void:
@@ -531,6 +541,7 @@ func _gfind_search(
 			_set_status(T_Status.ERROR_REGEX_SEARCH_TERM)
 			return
 
+
 	while not queue.is_empty():
 		entry_data = queue.pop_front()
 		entry = DirAccess.open(entry_data[0])
@@ -539,13 +550,14 @@ func _gfind_search(
 		entry_path        = entry.get_current_dir().simplify_path()
 		entry_path_parent = entry_data[1]
 
-		#print("At: " + entry_path)
-		entry.include_hidden = true
+		entry.include_hidden = settings.include_hidden
 		entry.list_dir_begin()
 
 		while true:
 			next_name = entry.get_next()
-			if not next_name: break
+			if not next_name:
+				_set_status(T_Status.DONE)
+				break
 
 			_m_iterations += 1
 			if _m_iterations > C_MAX_SEARCH_ITERATIONS:
@@ -553,9 +565,8 @@ func _gfind_search(
 					+ "This could be caused by a recursive symbolic links/junction within the "
 					+ "search directory."
 				)
-				_sort_results()
 				_set_status(T_Status.ERROR_ITERATIONS)
-				return
+				break
 
 			# If it's a folder (this includes symbolic links), add it to the queue for further
 			# exploration
@@ -586,8 +597,8 @@ func _gfind_search(
 
 		entry.list_dir_end()
 
+	# Final step
 	_sort_results()
-	_set_status(T_Status.DONE)
 
 # --------------------------------------------------------------------------------------------------
 func _gfind_search_in_file(
@@ -638,8 +649,7 @@ func _gfind_search_in_file(
 				previews.push_back(_make_preview(
 					file_contents,
 					regex_result.get_start(),
-					regex_result.get_end(),
-					settings.extended_previews
+					regex_result.get_end()
 				))
 
 	else:
@@ -656,8 +666,7 @@ func _gfind_search_in_file(
 					previews.push_back(_make_preview(
 						file_contents,
 						find_pos,
-						find_pos + search_term_length,
-						settings.extended_previews
+						find_pos + search_term_length
 					))
 
 				find_pos += 1
@@ -746,7 +755,7 @@ func _add_entry_from_result(result : T_Search_Result) -> void:
 	var newline     := PackedByteArray([10]).get_string_from_ascii()
 	var preview_str := ""
 	for preview in result.previews:
-		preview_str += preview.text + newline
+		preview_str += preview.left + preview.text + preview.right + newline
 	#preview_str = " "
 
 	entry.set_tooltip_text(C_COLUMN_FILENAME,   preview_str)
@@ -825,8 +834,7 @@ func _file_size_to_str(size : int) -> String:
 func _make_preview(
 	file_contents    : String,
 	start            : int,
-	end              : int,
-	extended_preview : bool
+	end              : int
 ) -> T_Preview:
 	var preview := T_Preview.new()
 
@@ -834,9 +842,6 @@ func _make_preview(
 		return preview
 
 	preview.text = file_contents.substr(start, end - start)
-
-	if not extended_preview:
-		return preview
 
 	#pad   = max(start - preview_padding, 0)
 	#match_length  = result.get_end() - match_start + preview_padding

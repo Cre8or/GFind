@@ -11,10 +11,12 @@ GFind is a stand-alone text search and replace tool made with the Godot game eng
 - Search case sensitive
 - Search using regular expressions
 - Include binary files in search
+- Include hidden files in search
+- Persistent user preferences across sessions
 
 ### Planned
-- Extended previews with colour highlighting
 - Better status reporting/visuals
+- Extended previews with colour highlighting?
 
 ## License
 

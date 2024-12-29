@@ -17,7 +17,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." node_paths=PackedStringArray("CtrlSearchDir", "CtrlSearchTerm", "CtrlReplaceTerm", "CtrlButtonSearch", "CtrlButtonReplace", "CtrlRecursive", "CtrlRegex", "CtrlExtendedPreviews", "CtrlCaseSensitive", "CtrlIncludeBinary", "CtrlStatus", "CtrlTable", "CtrlWindowConfirm", "CtrlButtonReplaceCancel", "CtrlButtonReplaceConfirm", "CtrlWindowTooltip", "CtrlTooltip")]
+[node name="VBoxContainer" type="VBoxContainer" parent="." node_paths=PackedStringArray("CtrlSearchDir", "CtrlSearchTerm", "CtrlReplaceTerm", "CtrlButtonSearch", "CtrlButtonReplace", "CtrlRecursive", "CtrlCaseSensitive", "CtrlRegex", "CtrlIncludeBinary", "CtrlIncludeHidden", "CtrlStatus", "CtrlTable", "CtrlWindowConfirm", "CtrlButtonReplaceCancel", "CtrlButtonReplaceConfirm", "CtrlWindowTooltip", "CtrlTooltip")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,10 +32,10 @@ CtrlReplaceTerm = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxCon
 CtrlButtonSearch = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/Button_Search")
 CtrlButtonReplace = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/Button_Replace")
 CtrlRecursive = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/Recursive_CheckBox")
-CtrlRegex = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/Regex_CheckBox")
-CtrlExtendedPreviews = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/ExtendedPreviews_CheckBox")
 CtrlCaseSensitive = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/CaseSensitive_CheckBox")
+CtrlRegex = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/Regex_CheckBox")
 CtrlIncludeBinary = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/IncludeBinary_CheckBox")
+CtrlIncludeHidden = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer/IncludeHidden_CheckBox")
 CtrlStatus = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/Status")
 CtrlTable = NodePath("PanelContainer/MarginContainer/Results")
 CtrlWindowConfirm = NodePath("../Window_ConfirmReplace")
@@ -143,9 +143,9 @@ text = "Search recursively"
 layout_mode = 2
 text = "Regular expression"
 
-[node name="ExtendedPreviews_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
+[node name="IncludeHidden_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
 layout_mode = 2
-text = "Extended previews"
+text = "Include hidden files"
 
 [node name="CaseSensitive_CheckBox" type="CheckBox" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/GridContainer"]
 layout_mode = 2
