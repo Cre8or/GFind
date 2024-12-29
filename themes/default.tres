@@ -1,4 +1,8 @@
-[gd_resource type="Theme" load_steps=11 format=3 uid="uid://bxjeq7bn2vjqd"]
+[gd_resource type="Theme" load_steps=14 format=3 uid="uid://bxjeq7bn2vjqd"]
+
+[ext_resource type="Texture2D" uid="uid://dmljg8v52uv6u" path="res://icons/TileChecked.svg" id="1_k7mc3"]
+[ext_resource type="Texture2D" uid="uid://cl70dxunvom8m" path="res://icons/GuiUnchecked.svg" id="3_e2rnw"]
+[ext_resource type="Texture2D" uid="uid://cpl11kd0iwgdf" path="res://icons/GuiUncheckedDisabled.svg" id="4_330vb"]
 
 [sub_resource type="SystemFont" id="SystemFont_t8k8i"]
 font_names = PackedStringArray("DejaVu Sans")
@@ -42,6 +46,10 @@ Button/font_sizes/font_size = 14
 Button/fonts/font = SubResource("SystemFont_t8k8i")
 CheckBox/font_sizes/font_size = 14
 CheckBox/fonts/font = SubResource("SystemFont_eeblp")
+CheckBox/icons/checked = ExtResource("1_k7mc3")
+CheckBox/icons/checked_disabled = null
+CheckBox/icons/unchecked = ExtResource("3_e2rnw")
+CheckBox/icons/unchecked_disabled = ExtResource("4_330vb")
 ItemList/font_sizes/font_size = 14
 ItemList/fonts/font = SubResource("SystemFont_eeblp")
 Label/font_sizes/font_size = 14

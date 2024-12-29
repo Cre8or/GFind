@@ -24,8 +24,6 @@ extends HBoxContainer
 @export var CtrlText   : LineEdit
 @export var CtrlDialog : FileDialog
 
-@onready var _default_dir : String
-
 
 
 # Built-in methods
@@ -33,12 +31,6 @@ extends HBoxContainer
 func _ready() -> void:
 	CtrlButton.pressed.connect(_on_button_press)
 	CtrlDialog.dir_selected.connect(_on_dir_selected)
-
-	_default_dir = OS.get_environment("HOME")
-	if not _default_dir:
-		_default_dir = OS.get_executable_path().get_base_dir()
-
-	CtrlText.set_placeholder(_default_dir)
 
 
 
@@ -59,8 +51,8 @@ func _on_button_press() -> void:
 
 	if not DirAccessor:
 		printerr("Directory \"" + dir + "\" does not exist!")
-		dir = _default_dir
+		dir = OS.get_executable_path().get_base_dir()
 
-	print("Opening dialog at: \"" + dir + "\"")
+	CtrlText.text = dir
 	CtrlDialog.set_current_dir(dir)
 	CtrlDialog.show()

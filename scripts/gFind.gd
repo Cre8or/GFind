@@ -76,6 +76,17 @@ const C_MAX_INTERVAL_BETWEEN_FRAMES := 20 # in ms
 const C_TOOLTIP_SHOW_DELAY          := 500 # in ms
 const C_MAX_PAD_LENGTH              := 10 # in characters 
 
+const C_FILENAME_PREFERENCES := "preferences.ini"
+
+const C_SECTION_PREVIOUS_SETTINGS := "Previous_Settings"
+const C_SECTION_FILTERS           := "Filters"
+
+const C_KEY_SEARCH_TERM           := "search_term"
+const C_KEY_REPLACE_TERM          := "replace_term"
+const C_KEY_SEARCH_RECURSIVELY    := "search_recursively"
+const C_KEY_SEARCH_CASE_SENSITIVE := "search_case_sensitive"
+const C_KEY_USE_REGEX             := "use_regex"
+const C_KEY_INCLUDE_BINARY        := "include_binary"
 
 
 # Exports
@@ -123,7 +134,7 @@ var _m_invert_sort_order := false
 var _m_search_results    : Array[T_Search_Result]
 var _m_regex             := RegEx.new()
 var _m_iterations        := 0
-var _m_settings          := T_Search_Settings.new()
+var _m_executable_dir    : String
 
 
 
@@ -149,53 +160,22 @@ func _ready() -> void:
 	CtrlTable.set_column_expand_ratio(C_COLUMN_SIZE,       3)
 	CtrlTable.set_column_expand_ratio(C_COLUMN_PATH_SHORT, 20)
 
+	if OS.has_feature("editor"):
+		_m_executable_dir = OS.get_user_data_dir()
+	else:
+		_m_executable_dir = OS.get_executable_path().get_base_dir()
+	print("Executable directory: " + _m_executable_dir)
+
+	_load_user_preferences()
+	_parse_command_line()
 	_set_status(T_Status.IDLE)
 
-	#region Test values (for development purposes)
-	# Only run the code below if we're not running from within the editor.
-	# Using Engine.is_editor_hint() does not work here, as that is intended for tool scripts.
-	if OS.has_feature("editor"):
-		# If a source directory is passed, the search directory is removed and a copy
-		# of the source data is pasted in its place. This was useful during development
-		# at times where the replace function would corrupt files.
-		if test_data_source_directory and test_search_directory:
-			if DirAccess.dir_exists_absolute(test_search_directory):
-				OS.execute("rm", ["-r", test_search_directory])
-			OS.execute("cp", ["-r", "-a", "-L", test_data_source_directory, test_search_directory])
+# --------------------------------------------------------------------------------------------------
+func _notification(kind):
+	if kind == NOTIFICATION_WM_CLOSE_REQUEST:
+		_save_user_preferences()
 
-		CtrlSearchDir.text           = test_search_directory
-		CtrlSearchTerm.text          = test_search_term
-		#CtrlSearchTerm.text         = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
-		CtrlReplaceTerm.text         = test_replace_term
-		CtrlRecursive.button_pressed = test_search_recursively
-		CtrlRegex.button_pressed     = test_use_regex
-
-		_on_search_pressed()
-		return
-	#endregion
-
-	#region Command line parsing
-	# Check if a working directory was passed (first argument after a blank "--")
-	var args := OS.get_cmdline_user_args()
-	if not args: return
-
-	var search_dir := args[0]
-	if not search_dir: return
-
-	var current_dir := OS.get_executable_path().get_base_dir()
-	var dir_access  := DirAccess.open(current_dir)
-	if not dir_access:
-		print("ERROR: Working directory cannot be opened! (" + error_string(DirAccess.get_open_error()) + ")")
-		return
-
-	print("Working directory: " + current_dir)
-	if not dir_access.dir_exists(search_dir):
-		print("ERROR: Directory not found! (\"" + search_dir + "\")")
-		return
-
-	print("Search directory: " + search_dir)
-	CtrlSearchDir.text = search_dir
-	#endregion
+		get_tree().quit()
 
 
 
@@ -215,7 +195,7 @@ func _on_search_pressed() -> void:
 	await _gfind_search(
 		CtrlSearchDir.text,
 		CtrlSearchTerm.text,
-		_get_gfind_settings(),
+		_get_current_search_settings(),
 		false
 	)
 
@@ -246,7 +226,7 @@ func _on_replace_confirm_pressed() -> void:
 	await _gfind_search(
 		CtrlSearchDir.text,
 		CtrlSearchTerm.text,
-		_get_gfind_settings(),
+		_get_current_search_settings(),
 		true,
 		CtrlReplaceTerm.text
 	)
@@ -287,9 +267,108 @@ func _on_column_title_clicked(
 	print("Column " + str(column) + " pressed")
 	_sort_results()
 
+
 # --------------------------------------------------------------------------------------------------
-func _get_gfind_settings() -> T_Search_Settings:
-	var settings := T_Search_Settings.new()
+func _parse_command_line() -> void:
+
+	#region Test values (for development purposes)
+	# Only run the code below if we're not running from within the editor.
+	# Using Engine.is_editor_hint() does not work here, as that is intended for tool scripts.
+	if OS.has_feature("editor"):
+		# If a source directory is passed, the search directory is removed and a copy
+		# of the source data is pasted in its place. This was useful during development
+		# at times where the replace function would corrupt files.
+		if test_data_source_directory and test_search_directory:
+			if DirAccess.dir_exists_absolute(test_search_directory):
+				OS.execute("rm", ["-r", test_search_directory])
+			OS.execute("cp", ["-r", "-a", "-L", test_data_source_directory, test_search_directory])
+
+		CtrlSearchDir.text           = test_search_directory
+		CtrlSearchTerm.text          = test_search_term
+		#CtrlSearchTerm.text         = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
+		CtrlReplaceTerm.text         = test_replace_term
+		CtrlRecursive.button_pressed = test_search_recursively
+		CtrlRegex.button_pressed     = test_use_regex
+
+		_on_search_pressed()
+		return
+	#endregion
+
+	#region Proper command line parsing
+	CtrlSearchDir.text = _m_executable_dir
+
+	# Check if a working directory was passed (first argument after a blank "--")
+	var args := OS.get_cmdline_user_args()
+	if not args: return
+
+	var search_dir := args[0]
+	if not search_dir: return
+
+	var dir_access := DirAccess.open(_m_executable_dir)
+	if not dir_access:
+		printerr("ERROR: Working directory cannot be opened! (" + error_string(DirAccess.get_open_error()) + ")")
+		return
+
+	if not dir_access.dir_exists(search_dir):
+		printerr("ERROR: Directory not found! (\"" + search_dir + "\")")
+		return
+
+	print("Search directory: " + search_dir)
+	CtrlSearchDir.text = search_dir
+	#endregion
+
+# --------------------------------------------------------------------------------------------------
+func _load_user_preferences() -> void:
+	var file_path := _m_executable_dir + "/" + C_FILENAME_PREFERENCES
+	if not FileAccess.file_exists(file_path):
+		print("User preferences not set, skipping loading")
+		return
+
+	var preferences := ConfigFile.new()
+	var return_code := preferences.load(file_path)
+	if return_code != OK:
+		print("Could not load user preferences (" + error_string(return_code) + ")")
+		return
+
+	# The preference file exists; let's parse it
+	print("Loading user preferences...")
+	CtrlSearchTerm.text = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_TERM, "") as String
+	CtrlReplaceTerm.text = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_REPLACE_TERM, "") as String
+	CtrlRecursive.button_pressed = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_RECURSIVELY, false) as bool
+	CtrlCaseSensitive.button_pressed = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_CASE_SENSITIVE, false) as bool
+	CtrlRegex.button_pressed = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_USE_REGEX, false) as bool
+	CtrlIncludeBinary.button_pressed = preferences.get_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_BINARY, false) as bool
+
+# --------------------------------------------------------------------------------------------------
+func _save_user_preferences() -> void:
+	print("Saving user preferences...")
+
+	var preferences := ConfigFile.new()
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_TERM, CtrlSearchTerm.text)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_REPLACE_TERM, CtrlReplaceTerm.text)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_RECURSIVELY, CtrlRecursive.button_pressed)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_SEARCH_CASE_SENSITIVE, CtrlCaseSensitive.button_pressed)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_USE_REGEX, CtrlRegex.button_pressed)
+	preferences.set_value(
+		C_SECTION_PREVIOUS_SETTINGS, C_KEY_INCLUDE_BINARY, CtrlIncludeBinary.button_pressed)
+
+	var file_path := _m_executable_dir + "/" + C_FILENAME_PREFERENCES
+	preferences.save(file_path)
+
+# --------------------------------------------------------------------------------------------------
+func _get_current_search_settings() -> T_Search_Settings:
+	var settings                   := T_Search_Settings.new()
 	settings.search_recursively    = CtrlRecursive.button_pressed
 	settings.search_case_sensitive = CtrlCaseSensitive.button_pressed
 	settings.use_regex             = CtrlRegex.button_pressed
@@ -470,7 +549,7 @@ func _gfind_search(
 
 			_m_iterations += 1
 			if _m_iterations > C_MAX_SEARCH_ITERATIONS:
-				push_error("Aborting: iterations limit reached! (" + str(C_MAX_SEARCH_ITERATIONS) + ")\n"
+				printerr("Aborting: iterations limit reached! (" + str(C_MAX_SEARCH_ITERATIONS) + ")\n"
 					+ "This could be caused by a recursive symbolic links/junction within the "
 					+ "search directory."
 				)
