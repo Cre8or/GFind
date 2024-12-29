@@ -1,12 +1,19 @@
-## GFind
+# GFind
 
-GFind is a stand-alone text search and replace tool made with the Godot game engine. Originally a cheap attempt to replace KDE's KFind app, this project grew to become my very own grepWin clone for Linux.
+<p align="center">
+	<img src="logo.png" width="128" alt="GFind logo">
+</p>
 
-![Screenshot of GFind results of a regex search](https://raw.githubusercontent.com/cre8or/GFind/master/github/screenshot.png)
+## Description
 
+**GFind** is a stand-alone text search and replace tool made with the Godot game engine.
+
+Originally started as a learning project and a low-effort attempt to replace KDE's [KFind](https://apps.kde.org/kfind/) app, this tool has become my daily driver for search and replace operations on platforms where existing alternatives such as Stefan Küng's [grepWin](https://tools.stefankueng.com/grepWin.html) are not available.
+
+<img src=".github/screenshot.png" alt="Screenshot of GFind results of a regex search">
 
 ## Features
-### Implemented
+### Implemented:
 - Recursive search
 - Search case sensitive
 - Search using regular expressions
@@ -14,7 +21,7 @@ GFind is a stand-alone text search and replace tool made with the Godot game eng
 - Include hidden files in search
 - Persistent user preferences across sessions
 
-### Planned
+### Planned:
 - Better status reporting/visuals
 - Extended previews with colour highlighting?
 
