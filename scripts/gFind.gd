@@ -154,25 +154,47 @@ func _ready() -> void:
 	#region Test values (for development purposes)
 	# Only run the code below if we're not running from within the editor.
 	# Using Engine.is_editor_hint() does not work here, as that is intended for tool scripts.
-	if not OS.has_feature("editor"):
+	if OS.has_feature("editor"):
+		# If a source directory is passed, the search directory is removed and a copy
+		# of the source data is pasted in its place. This was useful during development
+		# at times where the replace function would corrupt files.
+		if test_data_source_directory and test_search_directory:
+			if DirAccess.dir_exists_absolute(test_search_directory):
+				OS.execute("rm", ["-r", test_search_directory])
+			OS.execute("cp", ["-r", "-a", "-L", test_data_source_directory, test_search_directory])
+
+		CtrlSearchDir.text           = test_search_directory
+		CtrlSearchTerm.text          = test_search_term
+		#CtrlSearchTerm.text         = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
+		CtrlReplaceTerm.text         = test_replace_term
+		CtrlRecursive.button_pressed = test_search_recursively
+		CtrlRegex.button_pressed     = test_use_regex
+
+		_on_search_pressed()
+		return
+	#endregion
+
+	#region Command line parsing
+	# Check if a working directory was passed (first argument after a blank "--")
+	var args := OS.get_cmdline_user_args()
+	if not args: return
+
+	var search_dir := args[0]
+	if not search_dir: return
+
+	var current_dir := OS.get_executable_path().get_base_dir()
+	var dir_access  := DirAccess.open(current_dir)
+	if not dir_access:
+		print("ERROR: Working directory cannot be opened! (" + error_string(DirAccess.get_open_error()) + ")")
 		return
 
-	# If a source directory is passed, the search directory is removed and a copy
-	# of the source data is pasted in its place. This was useful during development
-	# at times where the replace function would corrupt files.
-	if test_data_source_directory and test_search_directory:
-		if DirAccess.dir_exists_absolute(test_search_directory):
-			OS.execute("rm", ["-r", test_search_directory])
-		OS.execute("cp", ["-r", "-a", "-L", test_data_source_directory, test_search_directory])
+	print("Working directory: " + current_dir)
+	if not dir_access.dir_exists(search_dir):
+		print("ERROR: Directory not found! (\"" + search_dir + "\")")
+		return
 
-	CtrlSearchDir.text           = test_search_directory
-	CtrlSearchTerm.text          = test_search_term
-	#CtrlSearchTerm.text         = "//[\\s]+([a-z0-9_\\- \\.!\\?'#,;:]+)"
-	CtrlReplaceTerm.text         = test_replace_term
-	CtrlRecursive.button_pressed = test_search_recursively
-	CtrlRegex.button_pressed     = test_use_regex
-
-	_on_search_pressed()
+	print("Search directory: " + search_dir)
+	CtrlSearchDir.text = search_dir
 	#endregion
 
 

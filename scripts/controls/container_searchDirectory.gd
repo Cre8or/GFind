@@ -34,7 +34,7 @@ func _ready() -> void:
 	CtrlButton.pressed.connect(_on_button_press)
 	CtrlDialog.dir_selected.connect(_on_dir_selected)
 
-	_default_dir = OS.get_environment("HOMEA")
+	_default_dir = OS.get_environment("HOME")
 	if not _default_dir:
 		_default_dir = OS.get_executable_path().get_base_dir()
 
