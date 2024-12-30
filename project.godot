@@ -19,6 +19,10 @@ run/low_processor_mode=true
 boot_splash/show_image=false
 config/icon="res://logo.png"
 
+[debug]
+
+file_logging/enable_file_logging.pc=false
+
 [display]
 
 window/size/viewport_width=800
@@ -43,3 +47,4 @@ theme/custom="res://themes/default.tres"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
+shader_compiler/shader_cache/enabled=false

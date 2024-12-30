@@ -1,8 +1,10 @@
 # General parameters
 platform = "linuxbsd"
 target = "template_release"
+production = "yes"
 optimize = "size"
 lto = "full"
+deprecated = "no"
 
 # Modules
 modules_enabled_by_default = "no"
@@ -22,6 +24,6 @@ speechd = "no"
 pulseaudio = "no"
 alsa = "no"
 disable_3d = "yes"
-threads = "no"
+#threads = "no" # Disabling threads causes issues with native file dialogs
 openxr = "no"
 graphite = "no"
