@@ -1,10 +1,13 @@
 # General parameters
 platform = "linuxbsd"
 target = "template_release"
-production = "yes"
 optimize = "size"
 lto = "full"
 deprecated = "no"
+
+# Project parameters
+extra_suffix = "gFind"
+production = "yes"
 
 # Modules
 modules_enabled_by_default = "no"
@@ -27,3 +30,7 @@ disable_3d = "yes"
 #threads = "no" # Disabling threads causes issues with native file dialogs
 openxr = "no"
 graphite = "no"
+
+
+builtin_libogg = "no"
+builtin_libvorbis = "no"
