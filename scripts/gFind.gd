@@ -92,6 +92,7 @@ const C_KEY_INCLUDE_HIDDEN        := "include_hidden"
 
 # Exports
 @export_category("GFind Controls")
+@export var CtrlButtonBrowse         : Button
 @export var CtrlSearchDir            : LineEdit
 @export var CtrlSearchTerm           : TextEdit
 @export var CtrlReplaceTerm          : TextEdit
@@ -146,6 +147,10 @@ func _ready() -> void:
 	CtrlButtonReplace.pressed.connect(_on_replace_pressed)
 	CtrlTable.column_title_clicked.connect(_on_column_title_clicked)
 	CtrlTable.item_activated.connect(_on_result_double_clicked)
+
+	CtrlSearchDir.gui_input.connect(_on_gui_input.bindv([CtrlSearchDir]))
+	CtrlSearchTerm.gui_input.connect(_on_gui_input.bindv([CtrlSearchTerm]))
+	CtrlReplaceTerm.gui_input.connect(_on_gui_input.bindv([CtrlReplaceTerm]))
 
 	CtrlWindowConfirm.close_requested.connect(_on_replace_cancel_pressed)
 	CtrlButtonReplaceCancel.pressed.connect(_on_replace_cancel_pressed)
@@ -268,9 +273,63 @@ func _on_column_title_clicked(
 	print("Column " + str(column) + " pressed")
 	_sort_results()
 
+# --------------------------------------------------------------------------------------------------
+func _on_gui_input(
+	event    : InputEvent,
+	CtrlText : Control
+) -> void:
+	var event_key := event as InputEventKey
+	if not CtrlText or not event_key: return
 
+	# Only consider key press events
+	if not event_key.pressed: return
+
+	# Remap the tab key to focus on neighbouring controls
+	match event_key.keycode:
+		KEY_TAB:
+			# Allow typing TAB when holding control
+			# This is exclusive to TextEdit controls, as using tabs for e.g. the search directory
+			# path seems unreasonable.
+			if event_key.is_ctrl_pressed() and CtrlText is TextEdit:
+				var tab := PackedByteArray([9]).get_string_from_ascii()
+
+				CtrlText.accept_event()
+				CtrlText.insert_text_at_caret(tab, 0)
+				return
+
+			# When not holding control, parse TAB presses as requests to switch focus to the next
+			# or previous control
+			var path := CtrlText.focus_next
+			if event_key.shift_pressed:
+				path = CtrlText.focus_previous
+
+			if not path: return
+			var CtrlNeighbour := CtrlText.get_node(path) as Control
+	#
+			if CtrlNeighbour:
+				# Flag the event as being consumed
+				# I don't know how it figures out which event is concerned, but somehow it works...
+				CtrlText.accept_event()
+				CtrlNeighbour.grab_focus()
+
+		KEY_ENTER, KEY_KP_ENTER:
+			# ENTER should trigger the button associated with this text field. Here we figure out
+			# which one is relevant for the current control.
+			var CtrlButton : Button
+			match CtrlText:
+				CtrlSearchDir:   CtrlButton = CtrlButtonBrowse
+				CtrlSearchTerm:  CtrlButton = CtrlButtonSearch
+				CtrlReplaceTerm: CtrlButton = CtrlButtonReplace
+
+			if CtrlButton:
+				CtrlText.accept_event()
+				CtrlButton.pressed.emit()
+	
 # --------------------------------------------------------------------------------------------------
 func _parse_command_line() -> void:
+
+	# Default input focus onto the search directory field
+	CtrlSearchDir.grab_focus()
 
 	#region Test values (for development purposes)
 	# Only run the code below if we're not running from within the editor.
@@ -320,6 +379,9 @@ func _parse_command_line() -> void:
 	print("Search directory: " + search_dir)
 	CtrlSearchDir.text = search_dir
 	#endregion
+
+	# If an initial search directory was parsed, focus on the search term field instead
+	CtrlSearchTerm.grab_focus()
 
 # --------------------------------------------------------------------------------------------------
 func _load_user_preferences() -> void:
@@ -623,7 +685,8 @@ func _gfind_search_in_file(
 
 	var search_term_length := search_term.length()
 	var binary_test_buffer := file.get_buffer(C_BINARY_TEST_BUFFER_LENGTH)
-	if not settings.include_binary and _is_data_binary(binary_test_buffer):
+	var _is_binary_file    := _is_data_binary(binary_test_buffer)
+	if not settings.include_binary and _is_binary_file:
 		#print("Skipping file search (contains binary data): " + file_path)
 		return
 	#endregion
@@ -637,7 +700,8 @@ func _gfind_search_in_file(
 	var previews          : Array[T_Preview]
 
 	#region Search file contents
-	if settings.use_regex:
+	# Regex searches only make sense on text files, not binary ones.
+	if settings.use_regex and not _is_binary_file:
 		var regex_results := _m_regex.search_all(file_contents)
 		matches = regex_results.size()
 

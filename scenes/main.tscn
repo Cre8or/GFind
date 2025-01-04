@@ -17,7 +17,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." node_paths=PackedStringArray("CtrlSearchDir", "CtrlSearchTerm", "CtrlReplaceTerm", "CtrlButtonSearch", "CtrlButtonReplace", "CtrlRecursive", "CtrlCaseSensitive", "CtrlRegex", "CtrlIncludeBinary", "CtrlIncludeHidden", "CtrlStatus", "CtrlTable", "CtrlWindowConfirm", "CtrlButtonReplaceCancel", "CtrlButtonReplaceConfirm", "CtrlWindowTooltip", "CtrlTooltip")]
+[node name="VBoxContainer" type="VBoxContainer" parent="." node_paths=PackedStringArray("CtrlButtonBrowse", "CtrlSearchDir", "CtrlSearchTerm", "CtrlReplaceTerm", "CtrlButtonSearch", "CtrlButtonReplace", "CtrlRecursive", "CtrlCaseSensitive", "CtrlRegex", "CtrlIncludeBinary", "CtrlIncludeHidden", "CtrlStatus", "CtrlTable", "CtrlWindowConfirm", "CtrlButtonReplaceCancel", "CtrlButtonReplaceConfirm", "CtrlWindowTooltip", "CtrlTooltip")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -26,6 +26,7 @@ grow_vertical = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 script = ExtResource("1_y5487")
+CtrlButtonBrowse = NodePath("PanelContainer_Directory/MarginContainer/HBoxContainer/Button_Browse")
 CtrlSearchDir = NodePath("PanelContainer_Directory/MarginContainer/HBoxContainer/LineEdit_Directory")
 CtrlSearchTerm = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/TextEdit_Search")
 CtrlReplaceTerm = NodePath("PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/TextEdit_Replace")
@@ -60,11 +61,11 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 0
 script = ExtResource("2_qa51y")
-CtrlButton = NodePath("Button")
+CtrlButton = NodePath("Button_Browse")
 CtrlText = NodePath("LineEdit_Directory")
 CtrlDialog = NodePath("FileDialog")
 
-[node name="Button" type="Button" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
+[node name="Button_Browse" type="Button" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
 layout_mode = 2
 text = "Browse"
 icon = ExtResource("2_mdfp2")
@@ -73,6 +74,7 @@ icon = ExtResource("2_mdfp2")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
+focus_next = NodePath("../../../../PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer/TextEdit_Search")
 caret_blink = true
 
 [node name="FileDialog" type="FileDialog" parent="VBoxContainer/PanelContainer_Directory/MarginContainer/HBoxContainer"]
@@ -103,12 +105,17 @@ text = "Search for:"
 [node name="TextEdit_Search" type="TextEdit" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_next = NodePath("../Button_Search")
+focus_previous = NodePath("../../../../../PanelContainer_Directory/MarginContainer/HBoxContainer/LineEdit_Directory")
 focus_mode = 1
 scroll_fit_content_height = true
 caret_blink = true
+caret_multiple = false
 
 [node name="Button_Search" type="Button" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
+focus_next = NodePath("../TextEdit_Replace")
+focus_previous = NodePath("../TextEdit_Search")
 text = "Find all"
 icon = ExtResource("3_82qgp")
 
@@ -119,12 +126,16 @@ text = "Replace with:"
 [node name="TextEdit_Replace" type="TextEdit" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_next = NodePath("../Button_Replace")
+focus_previous = NodePath("../Button_Search")
 focus_mode = 1
 scroll_fit_content_height = true
 caret_blink = true
+caret_multiple = false
 
 [node name="Button_Replace" type="Button" parent="VBoxContainer/PanelContainer_SearchReplace/MarginContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
+focus_previous = NodePath("../TextEdit_Replace")
 text = "Replace all"
 icon = ExtResource("4_jqttm")
 
