@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://c3wsoae6f8jbb"]
 
-[ext_resource type="Script" path="res://scripts/gFind.gd" id="1_y5487"]
+[ext_resource type="Script" uid="uid://26cqg5qsyg7e" path="res://scripts/gFind.gd" id="1_y5487"]
 [ext_resource type="Texture2D" uid="uid://crwltrnyrxth2" path="res://icons/FolderBrowse.svg" id="2_mdfp2"]
-[ext_resource type="Script" path="res://scripts/controls/container_searchDirectory.gd" id="2_qa51y"]
+[ext_resource type="Script" uid="uid://dfujrl84aqkyd" path="res://scripts/controls/container_searchDirectory.gd" id="2_qa51y"]
 [ext_resource type="Texture2D" uid="uid://b7vi5pevn204j" path="res://icons/Search.svg" id="3_82qgp"]
 [ext_resource type="Texture2D" uid="uid://b5wutonpiqeam" path="res://icons/Rename.svg" id="4_jqttm"]
 [ext_resource type="Texture2D" uid="uid://dovjegrrlvo5c" path="res://icons/MissingNode.svg" id="6_41gc7"]

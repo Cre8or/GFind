@@ -1,21 +1,9 @@
-[gd_resource type="Theme" load_steps=14 format=3 uid="uid://bxjeq7bn2vjqd"]
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://bxjeq7bn2vjqd"]
 
 [ext_resource type="Texture2D" uid="uid://dmljg8v52uv6u" path="res://icons/TileChecked.svg" id="1_k7mc3"]
 [ext_resource type="Texture2D" uid="uid://cl70dxunvom8m" path="res://icons/GuiUnchecked.svg" id="3_e2rnw"]
 [ext_resource type="Texture2D" uid="uid://cpl11kd0iwgdf" path="res://icons/GuiUncheckedDisabled.svg" id="4_330vb"]
-
-[sub_resource type="SystemFont" id="SystemFont_t8k8i"]
-font_names = PackedStringArray("DejaVu Sans")
-
-[sub_resource type="SystemFont" id="SystemFont_eeblp"]
-font_names = PackedStringArray("DejaVu Sans")
-
-[sub_resource type="SystemFont" id="SystemFont_b8iyt"]
-font_names = PackedStringArray("DejaVu Sans")
-font_weight = 500
-
-[sub_resource type="SystemFont" id="SystemFont_ty7yv"]
-font_names = PackedStringArray("DejaVu Sans")
+[ext_resource type="SystemFont" uid="uid://ba735yoefxui8" path="res://themes/main_font.tres" id="4_l6fbw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xhyhv"]
 bg_color = Color(0.16463, 0.180255, 0.195895, 1)
@@ -32,30 +20,24 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="SystemFont" id="SystemFont_y7g1o"]
-
-[sub_resource type="SystemFont" id="SystemFont_r1hhp"]
-
-[sub_resource type="SystemFont" id="SystemFont_1i4u1"]
-
-[sub_resource type="SystemFont" id="SystemFont_cvqla"]
+[sub_resource type="SystemFont" id="SystemFont_eeblp"]
 
 [resource]
 default_font = SubResource("SystemFont_eeblp")
 Button/font_sizes/font_size = 14
-Button/fonts/font = SubResource("SystemFont_t8k8i")
+Button/fonts/font = ExtResource("4_l6fbw")
 CheckBox/font_sizes/font_size = 14
-CheckBox/fonts/font = SubResource("SystemFont_eeblp")
+CheckBox/fonts/font = ExtResource("4_l6fbw")
 CheckBox/icons/checked = ExtResource("1_k7mc3")
 CheckBox/icons/checked_disabled = null
 CheckBox/icons/unchecked = ExtResource("3_e2rnw")
 CheckBox/icons/unchecked_disabled = ExtResource("4_330vb")
 ItemList/font_sizes/font_size = 14
-ItemList/fonts/font = SubResource("SystemFont_eeblp")
+ItemList/fonts/font = ExtResource("4_l6fbw")
 Label/font_sizes/font_size = 14
-Label/fonts/font = SubResource("SystemFont_b8iyt")
+Label/fonts/font = ExtResource("4_l6fbw")
 LineEdit/font_sizes/font_size = 14
-LineEdit/fonts/font = SubResource("SystemFont_ty7yv")
+LineEdit/fonts/font = ExtResource("4_l6fbw")
 MarginContainer/constants/margin_bottom = 4
 MarginContainer/constants/margin_left = 4
 MarginContainer/constants/margin_right = 4
@@ -63,12 +45,12 @@ MarginContainer/constants/margin_top = 4
 Panel/styles/panel = SubResource("StyleBoxFlat_xhyhv")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_6wm22")
 RichTextLabel/font_sizes/normal_font_size = 14
-RichTextLabel/fonts/normal_font = SubResource("SystemFont_y7g1o")
+RichTextLabel/fonts/normal_font = ExtResource("4_l6fbw")
 TextEdit/font_sizes/font_size = 14
-TextEdit/fonts/font = SubResource("SystemFont_r1hhp")
+TextEdit/fonts/font = ExtResource("4_l6fbw")
 Tree/constants/h_separation = 16
 Tree/constants/item_margin = 4
 Tree/font_sizes/font_size = 14
 Tree/font_sizes/title_button_font_size = 14
-Tree/fonts/font = SubResource("SystemFont_1i4u1")
-Tree/fonts/title_button_font = SubResource("SystemFont_cvqla")
+Tree/fonts/font = ExtResource("4_l6fbw")
+Tree/fonts/title_button_font = ExtResource("4_l6fbw")

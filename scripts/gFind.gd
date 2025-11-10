@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------
-# Copyright 2024 Cre8or
+# Copyright 2024-2025 Cre8or
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
 # in compliance with the License. You may obtain a copy of the License at
@@ -382,6 +382,7 @@ func _parse_command_line() -> void:
 
 	# If an initial search directory was parsed, focus on the search term field instead
 	CtrlSearchTerm.grab_focus()
+	CtrlSearchTerm.select_all()
 
 # --------------------------------------------------------------------------------------------------
 func _load_user_preferences() -> void:
@@ -693,16 +694,21 @@ func _gfind_search_in_file(
 
 	file.seek(0)
 	var file_contents_raw := file.get_buffer(file_size)
-	var file_contents     := file_contents_raw.get_string_from_utf8()
+	var file_contents_str := ""
 	var find_pos          := 0
 	var matches           := 0
 	var offsets           : Array[int]
 	var previews          : Array[T_Preview]
 
+	if not _is_binary_file:
+		file_contents_str = file_contents_raw.get_string_from_utf8()
+	
+	
+	
 	#region Search file contents
 	# Regex searches only make sense on text files, not binary ones.
-	if settings.use_regex and not _is_binary_file:
-		var regex_results := _m_regex.search_all(file_contents)
+	if settings.use_regex:
+		var regex_results := _m_regex.search_all(file_contents_str)
 		matches = regex_results.size()
 
 		if matches > 0 and not do_replace:
@@ -711,7 +717,7 @@ func _gfind_search_in_file(
 			for i in min(matches, C_MAX_MATCH_PREVIEWS): # 0 .. min - 1
 				regex_result = regex_results[i]
 				previews.push_back(_make_preview(
-					file_contents,
+					file_contents_str,
 					regex_result.get_start(),
 					regex_result.get_end()
 				))
@@ -719,16 +725,16 @@ func _gfind_search_in_file(
 	else:
 		while true:
 			if settings.search_case_sensitive:
-				find_pos = file_contents.find(search_term, find_pos)
+				find_pos = file_contents_str.find(search_term, find_pos)
 			else:
-				find_pos = file_contents.findn(search_term, find_pos)
+				find_pos = file_contents_str.findn(search_term, find_pos)
 
 			if find_pos >= 0:
 				offsets.push_back(find_pos)
 	
 				if matches < C_MAX_MATCH_PREVIEWS:
 					previews.push_back(_make_preview(
-						file_contents,
+						file_contents_str,
 						find_pos,
 						find_pos + search_term_length
 					))
@@ -758,24 +764,9 @@ func _gfind_search_in_file(
 		# We have write permission, let's replace the contents
 		if file:
 			if settings.use_regex:
-				var replaced_contents := _m_regex.sub(file_contents, replace_term, true)
-				if replaced_contents:
-					file.store_string(replaced_contents)
-				else:
-					push_error("Regex content replace failed! This should not happen!")
-
+				_replace_in_string_regex(file, file_contents_str, replace_term)
 			else:
-				var pos_start : int = 0
-				var slices    : Array[String]
-
-				for offset in offsets:
-					slices.push_back(file_contents.substr(pos_start, offset - pos_start))
-
-					if offset >= file_size: break
-
-					slices.push_back(replace_term)
-					pos_start = offset + search_term_length
-				file.store_string("".join(slices))
+				_replace_in_utf8_buffer(file, file_contents_str, file_size, replace_term, offsets, search_term_length)
 
 			file_size = file.get_length()
 			file.close()
@@ -788,6 +779,41 @@ func _gfind_search_in_file(
 	result.size     = file_size
 	result.previews = previews
 	_m_search_results.push_back(result)
+
+# --------------------------------------------------------------------------------------------------
+func _replace_in_string_regex(
+	file_out     : FileAccess,
+	buffer_in    : String,
+	replace_term : String
+) -> void:
+	var buffer_out := _m_regex.sub(buffer_in, replace_term, true)
+
+	if buffer_out:
+		file_out.store_string(buffer_out)
+	else:
+		push_error("Regex content replace failed! This should not happen!")
+
+
+# --------------------------------------------------------------------------------------------------
+func _replace_in_utf8_buffer(
+	file_out           : FileAccess,
+	buffer_in          : String,
+	buffer_size        : int,
+	replace_term       : String,
+	offsets            : Array[int],
+	search_term_length : int
+) -> void:
+	var pos_start : int = 0
+	var slices    : Array[String]
+
+	for offset in offsets:
+		slices.push_back(buffer_in.substr(pos_start, offset - pos_start))
+		if offset >= buffer_size: break
+
+		slices.push_back(replace_term)
+		pos_start = offset + search_term_length
+
+	file_out.store_string("".join(slices))
 
 # --------------------------------------------------------------------------------------------------
 func _clear_table(clear_results : bool = false) -> void:
